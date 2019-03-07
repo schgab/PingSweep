@@ -9,38 +9,38 @@ namespace PingSweep
     {
         static void Main(string[] args)
         {
-			Console.WriteLine("Start");
-            var t = MainAsync();
-			t.Wait();
+		Console.WriteLine("Start");
+		var t = MainAsync();
+		t.Wait();
         }
 		
 		
-		static async Task MainAsync()
+	static async Task MainAsync()
+	{
+		var results = await PingSweepAsync();
+		foreach(var res in results)
 		{
-			var results = await PingSweepAsync();
-			foreach(var res in results)
+			if(res.Status == IPStatus.Success)
 			{
-				if(res.Status == IPStatus.Success)
-				{
-					Console.WriteLine(res.Address.ToString());
-				}
+				Console.WriteLine(res.Address.ToString());
 			}
 		}
-		static async Task<List<PingReply>> PingSweepAsync()
+	}
+	static async Task<List<PingReply>> PingSweepAsync()
+	{
+		var tList = new List<Task<PingReply>>();
+		string addBase = "10.25.25.";
+		for (int i = 1; i <= 255; i++)
 		{
-			var tList = new List<Task<PingReply>>();
-			string addBase = "10.25.25.";
-            for (int i = 1; i <= 255; i++)
-            {
-                var t = PingAsync(addBase +  i.ToString());
+		var t = PingAsync(addBase +  i.ToString());
 				tList.Add(t);
-            }
-			return (await Task.WhenAll(tList)).ToList();
 		}
+		return (await Task.WhenAll(tList)).ToList();
+	}
         static async Task<PingReply> PingAsync(string ip)
         {
-            Ping p = new Ping();
-			return await p.SendPingAsync(ip,2000);						
+		Ping p = new Ping();
+		return await p.SendPingAsync(ip,2000);						
         }
         
     }
